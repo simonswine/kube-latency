@@ -1,19 +1,19 @@
 # kube-latency
 
-This is a simple little tools, that help to measure bandwidth and latency in a
+This is a simple little tool, that helps to measure bandwidth and latency in a
 kubernetes Pod Network.
 
 ![Screenshot Grafana](contrib/screenshots/grafana.png)
 
 ## Tests
 
-These tests are excuted on every node (through a DaemonSet) every 10 seconds
+These tests are excuted on every Node (through a DaemonSet) every 10 seconds
 
 * Test `/ping` all other Pods (5 times)
 * Download `/data` (16MBytes) from one randomly selected node
 
-The result of the tests is tagged with zone, node and pod information and
-scraped by prometheus. The result can graphed using Grafana.
+The result of the tests is tagged with Zone, Node and Pod information and
+scraped by Prometheus. The results can graphed using Grafana.
 
 ## Example test case
 
