@@ -17,6 +17,10 @@ spec:
         prometheus.io/kube-latency: "true"
         prometheus.io/port: {{ .Values.service.internalPort | quote }}
     spec:
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
