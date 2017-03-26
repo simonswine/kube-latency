@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -162,10 +163,15 @@ func (a *App) testLoop() {
 		if source == nil || len(destinations) == 0 {
 			log.Info("skip tests no suitable pods found")
 		} else {
+			// run ping tests against any node
 			for _, dest := range destinations {
 				go a.testPing(source, dest)
-				go a.testDownload(source, dest)
 			}
+
+			// run download tests against a single random selected node
+			dest := destinations[rand.Intn(len(destinations))]
+			go a.testDownload(source, dest)
+
 		}
 
 		time.Sleep(time.Duration(*testFrequency) * time.Second)
@@ -199,6 +205,9 @@ func (a *App) getPodLabels(podName string) (*Labels, error) {
 
 func (a *App) Run() {
 	log.Infof("starting kube-latency v%s (git %s, %s)", AppVersion, AppGitCommit, AppGitState)
+
+	// seed randomness
+	rand.Seed(time.Now().Unix())
 
 	// parse cli flags
 	flag.Parse()
@@ -265,7 +274,7 @@ func (a *App) testPing(source, dest *Labels) {
 	var labels []string
 	labels = append(labels, source.Values()...)
 	labels = append(labels, dest.Values()...)
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 5; i++ {
 		result, end, err := a.testHTTP(url)
 		if err != nil {
 			log.Warnf("test ping from '%s' failed: %s", url, err)
