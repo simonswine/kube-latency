@@ -1,0 +1,4 @@
+dependencies:
+- name: prometheus
+  version: 3.0.0
+  repository: https://kubernetes-charts.storage.googleapis.com/

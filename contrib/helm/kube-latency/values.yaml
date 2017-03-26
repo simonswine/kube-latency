@@ -1,0 +1,74 @@
+# Default values for kube-latency.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 3
+type: DaemonSet
+image:
+  repository: simonswine/kube-latency
+  tag: latest
+  pullPolicy: Always
+service:
+  name: http
+  type: ClusterIP
+  clusterIP: None
+  externalPort: 8080
+  internalPort: 8080
+resources:
+  limits:
+    cpu: 1
+    memory: 1024Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+prometheus:
+  kubeStateMetrics:
+    enabled: false
+  alertmanager:
+    enabled: false
+  nodeExporter:
+    enabled: false
+  server:
+    persistentVolume:
+      enabled: false
+  serverFiles:
+    alerts: ""
+    rules: ""
+
+    prometheus.yml: |-
+      rule_files:
+        - /etc/config/rules
+        - /etc/config/alerts
+
+      scrape_configs:
+        # * `prometheus.io/kube-latency`: Only scrape pods that have a value of `true`
+        # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+        # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
+        - job_name: 'kube-latency-pods'
+          scrape_interval: 20s
+
+          kubernetes_sd_configs:
+            - role: pod
+
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_kube_latency]
+              action: keep
+              regex: true
+            - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+              action: replace
+              target_label: __metrics_path__
+              regex: (.+)
+            - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+              action: replace
+              regex: (.+):(?:\d+);(\d+)
+              replacement: ${1}:${2}
+              target_label: __address__
+            - action: labelmap
+              regex: __meta_kubernetes_pod_label_(.+)
+            - source_labels: [__meta_kubernetes_namespace]
+              action: replace
+              target_label: kubernetes_namespace
+            - source_labels: [__meta_kubernetes_pod_name]
+              action: replace
+              target_label: kubernetes_pod_name
+

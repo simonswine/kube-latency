@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+{{- if eq .Values.type "Deployment"}}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        name: {{ template "fullname" . }}
+        app: {{ .Chart.Name }}
+      annotations:
+        prometheus.io/kube-latency: "true"
+        prometheus.io/port: {{ .Values.service.internalPort | quote }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command:
+        - /kube-latency
+        - -service-name
+        - {{ template "fullname" . }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        env:
+          - name: KUBE_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: KUBE_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        ports:
+        - containerPort: 8080
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
