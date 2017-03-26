@@ -1,0 +1,6 @@
+nodeSelector:
+  role: worker
+prometheus:
+  server:
+    nodeSelector:
+      role: monitoring

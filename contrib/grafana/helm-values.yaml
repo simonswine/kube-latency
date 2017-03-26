@@ -1,0 +1,19 @@
+server:
+  image: "grafana/grafana:4.2.0"
+  nodeSelector:
+    role: monitoring
+  adminUser: "admin"
+  adminPassword: "admin"
+  persistentVolume:
+    enabled: false
+  setDatasource:
+    enabled: true
+    image: appropriate/curl:latest
+    activeDeadlineSeconds: 300
+    datasource:
+      name: prometheus
+      type: prometheus
+      url: http://test-kl-prometheus-server
+      access: proxy
+      isDefault: "true"
+    restartPolicy: OnFailure
