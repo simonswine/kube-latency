@@ -131,7 +131,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "16*1024*1024/max(download_durations_s{quantile='0.99'}) by (source_zone, dest_zone)",
+              "expr": "(16*1024*1024)/(sum(abs(delta(download_durations_s_sum{}[1m]))< 50) by (source_zone,dest_zone)/sum(abs(delta(download_durations_s_count{}[1m]))) by (source_zone,dest_zone))",
               "hide": false,
               "interval": "",
               "intervalFactor": 5,
@@ -144,7 +144,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Bandwith per connection (worst per az tuple)",
+          "title": "Bandwith per connection (avg over downloads)",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -279,8 +279,8 @@
     "list": []
   },
   "time": {
-    "from": "2017-03-26T15:33:23.000Z",
-    "to": "2017-03-26T16:33:56.514Z"
+    "from": "2017-04-18T13:16:04.988Z",
+    "to": "2017-04-18T13:50:54.252Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -309,5 +309,5 @@
   },
   "timezone": "browser",
   "title": "Pod network",
-  "version": 9
+  "version": 3
 }
