@@ -29,9 +29,19 @@ helm upgrade --install --values contrib/grafana/helm-values.yaml grafana stable/
 # Port forwards
 ## prometheus localhost:9090
 ## grafana    localhost:9091
-kubectl port-forward $(kubectl get pods --namespace default -l "app=prometheus,release=test-kl" -o jsonpath="{.items[0].metadata.name}") 9090:9090
-kubectl port-forward $(kubectl get pods --namespace default -l "app=grafana-grafana,component=grafana" -o jsonpath="{.items[0].metadata.name}") 9091:3000
+kubectl port-forward --namespace default $(kubectl get pods --namespace default -l "app=prometheus,release=test-kl" -o jsonpath="{.items[0].metadata.name}") 9090:9090
+kubectl port-forward --namespace default $(kubectl get pods --namespace default -l "app=grafana-grafana,component=grafana" -o jsonpath="{.items[0].metadata.name}") 9091:3000
+
+# add the datasource to grafana
 
 # Import Grafana's dashboard from contrib/grafana/kube-latency-dashboard.json.
 The username and password for Grafana is admin.
+
+# Scale up the asg
+for i in {6..100..3}; do
+  echo "scaling to $i" && aws autoscaling set-desired-capacity --auto-scaling-group-name kubernetes-nonprod_devcluster-worker --desired-capacity $i && sleep 60
+done
+
 ```
+
+

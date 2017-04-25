@@ -4,3 +4,5 @@ prometheus:
   server:
     nodeSelector:
       role: monitoring
+    persistentVolume:
+      enabled: true
